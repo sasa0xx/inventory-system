@@ -22,7 +22,8 @@ function Dashboard({ products, workers, sales, purchases, settings }) {
   const textColor = isDark ? '#94a3b8' : '#64748b';
   const titleColor = isDark ? '#f8fafc' : '#0f172a';
 
-  // Common Chart Options for High Visibility
+  // Making the charts actually readable at 3 AM. 
+  // Coffee is the only reason these colors work.
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -74,14 +75,14 @@ function Dashboard({ products, workers, sales, purchases, settings }) {
   };
 
 
-  // --- STATS CALCULATION ---
+  // Crunching the numbers. Hope the math is right!
   const totalProducts = products.reduce((sum, p) => sum + p.quantity, 0);
   const totalValue = products.reduce((sum, p) => sum + (p.quantity * p.price), 0);
   const totalSales = sales.reduce((sum, s) => sum + s.total, 0);
   const totalPurchases = purchases.reduce((sum, p) => sum + p.total, 0);
   const profit = totalSales - totalPurchases;
 
-  // --- CHART 1: Category Distribution (Doughnut) ---
+  // Where did all our stock go? (The Doughnut Edition)
   const catData = {};
   products.forEach(p => catData[p.category] = (catData[p.category] || 0) + p.quantity);
   const categoryChart = {
@@ -89,7 +90,7 @@ function Dashboard({ products, workers, sales, purchases, settings }) {
     datasets: [{ data: Object.values(catData), backgroundColor: ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899'], borderWidth: 0 }]
   };
 
-  // --- CHART 2: Sales Momentum (Area) ---
+  // Are we getting rich yet? (Area Chart)
   const getLast7Days = () => {
     const days = [];
     for (let i = 6; i >= 0; i--) {
@@ -108,13 +109,13 @@ function Dashboard({ products, workers, sales, purchases, settings }) {
     datasets: [{ label: 'Sales', data: Object.values(salesByDay), borderColor: 'var(--accent-primary)', backgroundColor: 'rgba(139, 92, 246, 0.1)', fill: true, tension: 0.4 }]
   };
 
-  // --- CHART 3: Worker Performance Radar ---
+  // Tracking the team's wizardry
   const radarChart = {
     labels: workers.map(w => w.name.split(' ')[0]),
     datasets: [{ label: 'Total Revenue', data: workers.map(w => w.totalSales), borderColor: 'var(--accent-primary)', backgroundColor: 'rgba(139, 92, 246, 0.2)', borderWidth: 2 }]
   };
 
-  // --- CHART 4: Sales vs Purchases Comparison ---
+  // Money coming in vs Money going out
   const comparisonChart = {
     labels: ['Finances'],
     datasets: [
@@ -123,7 +124,7 @@ function Dashboard({ products, workers, sales, purchases, settings }) {
     ]
   };
 
-  // --- CHART 5: Low Stock Polar Area ---
+  // Red alert! these things are running out!
   const lowStockProducts = products.filter(p => p.quantity <= p.minStock);
   const polarChart = {
     labels: lowStockProducts.map(p => p.name),

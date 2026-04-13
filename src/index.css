@@ -56,7 +56,9 @@ body {
   align-items: center;
 }
 
-/* BUTTONS: NO MORE INVISIBLE BUTTONS */
+/* BUTTONS: NO MORE INVISIBLE BUTTONS. 
+   Seriously, I spent 20 minutes finding a button yesterday. 
+*/
 button {
   padding: 0.6rem 1.2rem;
   font-weight: 700;
@@ -76,7 +78,8 @@ button:hover {
   box-shadow: 0 0 15px var(--accent-primary);
 }
 
-/* Global button text color override to ensure visibility */
+/* Making sure the text doesn't vanish into the background.
+   Invisible text is a feature I haven't implemented yet. */
 .btn-primary, .btn-submit, .btn-purchase, .btn-sale, .btn-danger, .btn-delete, .settings-btn-main {
   color: #ffffff !important;
 }
@@ -99,7 +102,7 @@ button:hover {
   border: 1px solid var(--border-color);
 }
 
-/* INPUTS */
+/* Where users type things. Hopefully correctly. */
 input, select {
   background: var(--input-bg);
   border: 2px solid var(--border-color);
@@ -117,7 +120,7 @@ input:focus, select:focus {
 }
 
 
-/* SETTINGS DROPDOWN */
+/* The secret settings menu. Don't tell anyone. */
 .settings-dropdown {
   background: var(--bg-card) !important;
   border: 1px solid var(--border-color) !important;
@@ -147,7 +150,7 @@ input:focus, select:focus {
   accent-color: var(--accent-primary);
 }
 
-/* CARDS */
+/* Pretty boxes for all our data. */
 .card, .stat-card, .chart-card, .ai-section, .workers-section, .recent-sales {
   background: var(--bg-card);
   border: 2px solid var(--border-color);

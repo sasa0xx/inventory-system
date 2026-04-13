@@ -1,3 +1,4 @@
+/* The main stage. Where all the magic (and bugs) happen. */
 .home-page {
   padding: 2rem;
   background: var(--bg-main);

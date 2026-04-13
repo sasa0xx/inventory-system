@@ -5,7 +5,8 @@ import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import './App.css'
 
-// Initial sample data
+// Some fake data so the app doesn't look like a ghost town. 
+// If this isn't enough, we might need a bigger monitor.
 const initialProducts = [
   { id: 1, name: 'Laptop Dell XPS 15', category: 'Electronics', quantity: 12, price: 1299.99, costPrice: 1000.00, expiryDate: '2026-12-31', minStock: 5 },
   { id: 2, name: 'Office Chair', category: 'Furniture', quantity: 8, price: 299.99, costPrice: 200.00, expiryDate: null, minStock: 3 },
@@ -62,9 +63,11 @@ function App() {
   });
 
   useEffect(() => {
-    // Apply theme class
+    // Paint the walls with the user's favorite theme.
+    // Darkness is my ally.
     document.body.className = settings.theme + '-theme';
-    // Color manipulation helpers
+    // Math for colors. Don't ask me how this works, I'm just a dev.
+    // If it breaks, I'm becoming a gardener.
     const adjustColor = (hex, amount) => {
         let usePound = false;
         if (hex[0] === "#") { hex = hex.slice(1); usePound = true; }

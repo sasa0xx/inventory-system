@@ -4,6 +4,8 @@ import ProductForm from '../components/ProductForm'
 import TransactionModal from '../components/TransactionModal'
 
 function Home({ products, addProduct, updateProduct, deleteProduct, recordSale, recordPurchase, workers }) {
+  // Keeping track of all the modal chaos.
+  // One state to rule them all... kind of.
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [transactionModal, setTransactionModal] = useState({ show: false, type: null, product: null });

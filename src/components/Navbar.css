@@ -1,3 +1,4 @@
+/* Keeping things sticky so we don't get lost. */
 .navbar {
   background: var(--bg-navbar);
   border-bottom: 1px solid var(--border-color);

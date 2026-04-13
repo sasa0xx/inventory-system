@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import './ProductForm.css'
 
 function ProductForm({ product, onSave, onCancel }) {
+  // Syncing the form with the product... if we're in edit mode.
+  // This feels like magic when it works.
   const [formData, setFormData] = useState({
     name: '',
     category: '',

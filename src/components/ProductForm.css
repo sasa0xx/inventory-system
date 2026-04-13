@@ -1,3 +1,4 @@
+/* Adding more stuff to the database. Hopefully no SQL injection here! (Wait, this is React...) */
 .modal-overlay {
   position: fixed;
   top: 0;

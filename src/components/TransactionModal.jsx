@@ -2,6 +2,7 @@ import { useState } from 'react'
 import './TransactionModal.css'
 
 function TransactionModal({ type, product, workers, onConfirm, onCancel }) {
+  // Who is selling what? Let's find out.
   const [quantity, setQuantity] = useState(1);
   const [selectedWorker, setSelectedWorker] = useState(workers[0]?.id || '');
 

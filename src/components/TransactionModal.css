@@ -21,6 +21,27 @@
   max-width: 500px;
   border: 1px solid var(--border-color);
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Custom scrollbar for a cleaner look */
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
 }
 
 .modal-content h3 {
@@ -80,6 +101,126 @@
   border-radius: 8px;
 }
 
-.btn-cancel:hover {
-  background: #475569;
+.receipt-preview {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px dashed var(--border-color);
+}
+
+.receipt-preview h4 {
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.receipt {
+  background: #ffffff !important;
+  color: #1a1a1a !important;
+  padding: 1.5rem;
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  background-image: radial-gradient(#ddd 1.5px, transparent 0);
+  background-size: 15px 15px;
+  background-color: #fcfcfc;
+  border: 1px solid #ddd;
+}
+
+/* Force ALL children to be dark, overriding any theme variables */
+.receipt *, 
+.receipt h2, 
+.receipt h4, 
+.receipt p, 
+.receipt span, 
+.receipt th, 
+.receipt td {
+  color: #1a1a1a !important;
+}
+
+.receipt-header {
+  text-align: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px dashed #999;
+  padding-bottom: 1rem;
+}
+
+.receipt-header h2 {
+  font-size: 1.25rem;
+  margin-bottom: 0.3rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.receipt-header p {
+  font-size: 0.8rem;
+  color: #444 !important;
+  margin: 0.2rem 0;
+}
+
+.receipt-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.85rem;
+}
+
+.receipt-table th {
+  text-align: left;
+  border-bottom: 2px solid #333;
+  padding-bottom: 0.5rem;
+  font-weight: 800;
+}
+
+.receipt-table td {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.receipt-row-total {
+  border-top: 2px dashed #333;
+  margin-top: 0.8rem;
+  padding-top: 0.8rem;
+}
+
+.receipt-final-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.3rem 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.receipt-total-bold {
+  font-weight: 900 !important;
+  font-size: 1.2rem !important;
+  border-top: 2px solid #000;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  color: #000 !important;
+}
+
+.receipt-total-bold span {
+  font-weight: 900 !important;
+}
+
+.receipt-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.75rem;
+  color: #555 !important;
+  border-top: 1px dashed #999;
+  padding-top: 1rem;
+  line-height: 1.4;
+}
+
+.receipt-footer p {
+  margin: 0.2rem 0;
+}
+
+[dir="rtl"] .receipt-table th {
+  text-align: right;
+}
+
+[dir="rtl"] .receipt {
+  font-family: 'Arial', sans-serif; /* Courier doesn't always play nice with Arabic */
 }

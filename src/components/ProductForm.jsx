@@ -1,7 +1,40 @@
 import { useState, useEffect } from 'react'
 import './ProductForm.css'
 
-function ProductForm({ product, onSave, onCancel }) {
+function ProductForm({ product, onSave, onCancel, settings }) {
+  const currentLanguage = settings?.language || 'en';
+  
+  const t = {
+    en: {
+      edit: 'Edit Product',
+      add: 'Add New Product',
+      name: 'Product Name',
+      category: 'Category',
+      quantity: 'Quantity',
+      minStock: 'Min Stock',
+      price: 'Selling Price',
+      costPrice: 'Cost Price',
+      expiry: 'Expiry Date (Optional)',
+      cancel: 'Cancel',
+      updateBtn: 'Update Product',
+      addBtn: 'Add Product'
+    },
+    ar: {
+      edit: 'تعديل المنتج',
+      add: 'إضافة منتج جديد',
+      name: 'اسم المنتج',
+      category: 'الفئة',
+      quantity: 'الكمية',
+      minStock: 'الحد الأدنى للمخزون',
+      price: 'سعر البيع',
+      costPrice: 'سعر التكلفة',
+      expiry: 'تاريخ الانتهاء (اختياري)',
+      cancel: 'إلغاء',
+      updateBtn: 'تحديث المنتج',
+      addBtn: 'إضافة المنتج'
+    }
+  }[currentLanguage];
+
   // Syncing the form with the product... if we're in edit mode.
   // This feels like magic when it works.
   const [formData, setFormData] = useState({
@@ -43,10 +76,10 @@ function ProductForm({ product, onSave, onCancel }) {
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <h3>{product ? 'Edit Product' : 'Add New Product'}</h3>
+        <h3>{product ? t.edit : t.add}</h3>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Product Name</label>
+            <label>{t.name}</label>
             <input
               type="text"
               name="name"
@@ -57,7 +90,7 @@ function ProductForm({ product, onSave, onCancel }) {
           </div>
 
           <div className="form-group">
-            <label>Category</label>
+            <label>{t.category}</label>
             <input
               type="text"
               name="category"
@@ -69,7 +102,7 @@ function ProductForm({ product, onSave, onCancel }) {
 
           <div className="form-row">
             <div className="form-group">
-              <label>Quantity</label>
+              <label>{t.quantity}</label>
               <input
                 type="number"
                 name="quantity"
@@ -81,7 +114,7 @@ function ProductForm({ product, onSave, onCancel }) {
             </div>
 
             <div className="form-group">
-              <label>Min Stock</label>
+              <label>{t.minStock}</label>
               <input
                 type="number"
                 name="minStock"
@@ -95,7 +128,7 @@ function ProductForm({ product, onSave, onCancel }) {
 
           <div className="form-row">
             <div className="form-group">
-              <label>Selling Price</label>
+              <label>{t.price}</label>
               <input
                 type="number"
                 name="price"
@@ -108,7 +141,7 @@ function ProductForm({ product, onSave, onCancel }) {
             </div>
 
             <div className="form-group">
-              <label>Cost Price</label>
+              <label>{t.costPrice}</label>
               <input
                 type="number"
                 name="costPrice"
@@ -121,7 +154,7 @@ function ProductForm({ product, onSave, onCancel }) {
             </div>
 
             <div className="form-group">
-              <label>Expiry Date (Optional)</label>
+              <label>{t.expiry}</label>
               <input
                 type="date"
                 name="expiryDate"
@@ -133,10 +166,10 @@ function ProductForm({ product, onSave, onCancel }) {
 
           <div className="form-actions">
             <button type="button" onClick={onCancel} className="btn-cancel">
-              Cancel
+              {t.cancel}
             </button>
             <button type="submit" className="btn-submit">
-              {product ? 'Update' : 'Add'} Product
+              {product ? t.updateBtn : t.addBtn}
             </button>
           </div>
         </form>

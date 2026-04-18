@@ -12,7 +12,78 @@ ChartJS.register(
   BarElement, LineElement, PointElement, Title, Filler, RadialLinearScale
 );
 
-function Dashboard({ products, workers, sales, purchases, settings }) {
+function Dashboard({ products, workers, sales, purchases, settings, addAlarm }) {
+  const currentLanguage = settings?.language || 'en';
+
+  const t = {
+    en: {
+      stats: {
+        portfolio: 'Portfolio Value',
+        revenue: 'Revenue',
+        profit: 'Net Profit',
+        units: 'Total Units'
+      },
+      ai: {
+        title: '🧠 AI Strategic Restock',
+        placeholder: 'Enter budget...',
+        button: 'Generate Forecast',
+        loading: 'Analyzing...',
+        table: { product: 'Product', qty: 'Qty', subtotal: 'Subtotal', profit: 'Profit' },
+        error: 'AI Backend connection failed.'
+      },
+      charts: {
+        velocity: 'Sales Velocity',
+        performance: 'Worker Performance',
+        allocation: 'Stock Allocation',
+        comparison: 'Revenue vs Spends',
+        lowStock: 'Low Stock Alerts',
+        labels: { sales: 'Sales', revenue: 'Total Revenue', purchases: 'Purchases' }
+      },
+      team: {
+        title: '👥 Team Performance',
+        top: 'Top',
+        table: { name: 'Worker Name', count: 'Sales Count', total: 'Total Generated', status: 'Status' },
+        status: { active: 'Active', idle: 'No Sales' }
+      },
+      feed: {
+        title: 'Live Feed'
+      }
+    },
+    ar: {
+      stats: {
+        portfolio: 'قيمة المحفظة',
+        revenue: 'الإيرادات',
+        profit: 'صافي الربح',
+        units: 'إجمالي الوحدات'
+      },
+      ai: {
+        title: '🧠 إعادة التخزين الاستراتيجي بالذكاء الاصطناعي',
+        placeholder: 'أدخل الميزانية...',
+        button: 'إنشاء التوقعات',
+        loading: 'جاري التحليل...',
+        table: { product: 'المنتج', qty: 'الكمية', subtotal: 'المجموع الفرعي', profit: 'الربح' },
+        error: 'فشل الاتصال بخادم الذكاء الاصطناعي.'
+      },
+      charts: {
+        velocity: 'سرعة المبيعات',
+        performance: 'أداء الموظفين',
+        allocation: 'توزيع المخزون',
+        comparison: 'الإيرادات مقابل المصروفات',
+        lowStock: 'تنبيهات انخفاض المخزون',
+        labels: { sales: 'المبيعات', revenue: 'إجمالي الإيرادات', purchases: 'المشتريات' }
+      },
+      team: {
+        title: '👥 أداء الفريق',
+        top: 'الأفضل',
+        table: { name: 'اسم الموظف', count: 'عدد المبيعات', total: 'إجمالي المحقق', status: 'الحالة' },
+        status: { active: 'نشط', idle: 'لا مبيعات' }
+      },
+      feed: {
+        title: 'التغذية المباشرة'
+      }
+    }
+  }[currentLanguage];
+
   const [budget, setBudget] = useState(1000);
   const [aiList, setAiList] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -70,7 +141,7 @@ function Dashboard({ products, workers, sales, purchases, settings }) {
       const data = await response.json();
       setAiList(data.recommendations);
     } catch (error) {
-      alert('AI Backend connection failed.');
+      addAlarm(t.ai.error, 'warning');
     } finally { setLoading(false); }
   };
 
@@ -105,22 +176,22 @@ function Dashboard({ products, workers, sales, purchases, settings }) {
   last7Days.forEach(day => { salesByDay[day] = 0; });
   sales.forEach(s => { if (salesByDay[s.date.split('T')[0]] !== undefined) salesByDay[s.date.split('T')[0]] += s.total; });
   const momentumChart = {
-    labels: last7Days.map(d => new Date(d).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })),
-    datasets: [{ label: 'Sales', data: Object.values(salesByDay), borderColor: 'var(--accent-primary)', backgroundColor: 'rgba(139, 92, 246, 0.1)', fill: true, tension: 0.4 }]
+    labels: last7Days.map(d => new Date(d).toLocaleDateString(currentLanguage === 'ar' ? 'ar-EG' : undefined, { month: 'short', day: 'numeric' })),
+    datasets: [{ label: t.charts.labels.sales, data: Object.values(salesByDay), borderColor: 'var(--accent-primary)', backgroundColor: 'rgba(139, 92, 246, 0.1)', fill: true, tension: 0.4 }]
   };
 
   // Tracking the team's wizardry
   const radarChart = {
     labels: workers.map(w => w.name.split(' ')[0]),
-    datasets: [{ label: 'Total Revenue', data: workers.map(w => w.totalSales), borderColor: 'var(--accent-primary)', backgroundColor: 'rgba(139, 92, 246, 0.2)', borderWidth: 2 }]
+    datasets: [{ label: t.charts.labels.revenue, data: workers.map(w => w.totalSales), borderColor: 'var(--accent-primary)', backgroundColor: 'rgba(139, 92, 246, 0.2)', borderWidth: 2 }]
   };
 
   // Money coming in vs Money going out
   const comparisonChart = {
-    labels: ['Finances'],
+    labels: [currentLanguage === 'ar' ? 'المالية' : 'Finances'],
     datasets: [
-      { label: 'Revenue', data: [totalSales], backgroundColor: 'var(--accent-success)', borderRadius: 8 },
-      { label: 'Purchases', data: [totalPurchases], backgroundColor: 'var(--accent-danger)', borderRadius: 8 }
+      { label: t.charts.labels.revenue, data: [totalSales], backgroundColor: 'var(--accent-success)', borderRadius: 8 },
+      { label: t.charts.labels.purchases, data: [totalPurchases], backgroundColor: 'var(--accent-danger)', borderRadius: 8 }
     ]
   };
 
@@ -141,19 +212,19 @@ function Dashboard({ products, workers, sales, purchases, settings }) {
         {settings.dashboardVisibility.stats && (
           <div className="stats-grid">
             <div className="stat-card">
-              <h3>Portfolio Value</h3>
+              <h3>{t.stats.portfolio}</h3>
               <p className="stat-number">${totalValue.toLocaleString()}</p>
             </div>
             <div className="stat-card">
-              <h3 style={{ color: 'var(--accent-success)' }}>Revenue</h3>
+              <h3 style={{ color: 'var(--accent-success)' }}>{t.stats.revenue}</h3>
               <p className="stat-number" style={{ color: 'var(--accent-success)' }}>${totalSales.toLocaleString()}</p>
             </div>
             <div className="stat-card">
-              <h3 style={{ color: 'var(--accent-primary)' }}>Net Profit</h3>
+              <h3 style={{ color: 'var(--accent-primary)' }}>{t.stats.profit}</h3>
               <p className="stat-number" style={{ color: 'var(--accent-primary)' }}>${profit.toLocaleString()}</p>
             </div>
             <div className="stat-card">
-              <h3>Total Units</h3>
+              <h3>{t.stats.units}</h3>
               <p className="stat-number">{totalProducts}</p>
             </div>
           </div>
@@ -165,17 +236,17 @@ function Dashboard({ products, workers, sales, purchases, settings }) {
           <div className="main-col">
             {settings.dashboardVisibility.ai && (
               <div className="ai-section">
-                <h3>🧠 AI Strategic Restock</h3>
+                <h3>{t.ai.title}</h3>
                 <div className="ai-controls">
-                  <input type="number" value={budget} onChange={(e) => setBudget(e.target.value)} placeholder="Enter budget..." />
+                  <input type="number" value={budget} onChange={(e) => setBudget(e.target.value)} placeholder={t.ai.placeholder} />
                   <button className="btn-primary" onClick={generateAIList}>
-                    {loading ? 'Analyzing...' : 'Generate Forecast'}
+                    {loading ? t.ai.loading : t.ai.button}
                   </button>
                 </div>
                 {aiList && (
                   <div className="ai-results">
                     <table>
-                      <thead><tr><th>Product</th><th>Qty</th><th>Subtotal</th><th>Profit</th></tr></thead>
+                      <thead><tr><th>{t.ai.table.product}</th><th>{t.ai.table.qty}</th><th>{t.ai.table.subtotal}</th><th>{t.ai.table.profit}</th></tr></thead>
                       <tbody>
                         {aiList.map((item, i) => (
                           <tr key={i}><td>{item.name}</td><td>{item.quantity}</td><td>${item.totalCost.toFixed(0)}</td><td style={{color: 'var(--accent-success)', fontWeight: '600'}}>+${item.totalProfit.toFixed(0)}</td></tr>
@@ -190,19 +261,19 @@ function Dashboard({ products, workers, sales, purchases, settings }) {
             {settings.dashboardVisibility.charts && (
               <div className="charts-grid">
                 <div className="chart-card">
-                  <h3>Sales Velocity</h3>
+                  <h3>{t.charts.velocity}</h3>
                   <div className="chart-container"><Line data={momentumChart} options={chartOptions} /></div>
                 </div>
                 <div className="chart-card">
-                  <h3>Worker Performance</h3>
+                  <h3>{t.charts.performance}</h3>
                   <div className="chart-container"><Radar data={radarChart} options={chartOptions} /></div>
                 </div>
                 <div className="chart-card">
-                  <h3>Stock Allocation</h3>
+                  <h3>{t.charts.allocation}</h3>
                   <div className="chart-container"><Doughnut data={categoryChart} options={chartOptions} /></div>
                 </div>
                 <div className="chart-card">
-                  <h3>Revenue vs Spends</h3>
+                  <h3>{t.charts.comparison}</h3>
                   <div className="chart-container"><Bar data={comparisonChart} options={chartOptions} /></div>
                 </div>
               </div>
@@ -211,16 +282,16 @@ function Dashboard({ products, workers, sales, purchases, settings }) {
             {settings.dashboardVisibility.workers && (
               <div className="workers-section">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                  <h3>👥 Team Performance</h3>
-                  {topWorker && <span className="badge-top">Top: {topWorker.name}</span>}
+                  <h3>{t.team.title}</h3>
+                  {topWorker && <span className="badge-top">{t.team.top}: {topWorker.name}</span>}
                 </div>
                 <table>
                   <thead>
                     <tr>
-                      <th>Worker Name</th>
-                      <th>Sales Count</th>
-                      <th>Total Generated</th>
-                      <th>Status</th>
+                      <th>{t.team.table.name}</th>
+                      <th>{t.team.table.count}</th>
+                      <th>{t.team.table.total}</th>
+                      <th>{t.team.table.status}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -231,7 +302,7 @@ function Dashboard({ products, workers, sales, purchases, settings }) {
                         <td style={{ fontWeight: '600', color: 'var(--accent-success)' }}>${w.totalSales.toFixed(2)}</td>
                         <td>
                           <span className={`status-pill ${w.totalSales > 0 ? 'active' : 'idle'}`}>
-                            {w.totalSales > 0 ? 'Active' : 'No Sales'}
+                            {w.totalSales > 0 ? t.team.status.active : t.team.status.idle}
                           </span>
                         </td>
                       </tr>
@@ -244,14 +315,16 @@ function Dashboard({ products, workers, sales, purchases, settings }) {
 
           {/* SIDEBAR COLUMN */}
           <div className="side-col">
-            <div className="chart-card">
-              <h3>Low Stock Alerts</h3>
-              <div className="chart-container" style={{ height: '300px' }}><PolarArea data={polarChart} options={chartOptions} /></div>
-            </div>
+            {settings.dashboardVisibility.lowStock !== false && (
+              <div className="chart-card">
+                <h3>{t.charts.lowStock}</h3>
+                <div className="chart-container" style={{ height: '300px' }}><PolarArea data={polarChart} options={chartOptions} /></div>
+              </div>
+            )}
             
             {settings.dashboardVisibility.recentSales && (
               <div className="recent-sales">
-                <h3>Live Feed</h3>
+                <h3>{t.feed.title}</h3>
                 <div className="feed-container">
                   <table>
                     <tbody>
@@ -259,7 +332,7 @@ function Dashboard({ products, workers, sales, purchases, settings }) {
                         <tr key={s.id}>
                           <td>
                             <div style={{ fontWeight: '600' }}>{s.productName}</div>
-                            <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>{new Date(s.date).toLocaleTimeString()}</div>
+                            <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>{new Date(s.date).toLocaleTimeString(currentLanguage === 'ar' ? 'ar-EG' : undefined)}</div>
                           </td>
                           <td style={{ fontWeight: '700', color: 'var(--accent-success)', textAlign: 'right' }}>
                             +${s.total.toFixed(0)}

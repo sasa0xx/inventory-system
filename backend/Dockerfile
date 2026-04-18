@@ -9,9 +9,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy backend code
 COPY . .
 
-# Hugging Face Spaces default to port 7860
+# CRITICAL: Hugging Face REQUIRES port 7860. 
+# If you use 8000, the health check fails and the space dies.
 EXPOSE 7860
 
-# Start the application on port 7860
+# We force the port to 7860 here. 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7860"]
-

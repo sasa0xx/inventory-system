@@ -52,20 +52,71 @@ function App() {
     return saved ? JSON.parse(saved) : {
       accentColor: '#8b5cf6',
       theme: 'dark',
+      language: 'en',
       dashboardVisibility: {
         ai: true,
         stats: true,
         charts: true,
         workers: true,
-        recentSales: true
+        recentSales: true,
+        lowStock: true
       }
     };
   });
+
+  const [alarms, setAlarms] = useState(() => {
+    const saved = localStorage.getItem('alarms');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const playAlarmSound = () => {
+    // Generate a clean beep sound using the Web Audio API. 
+    // No external files = No broken links or loading delays.
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // High A note
+      
+      gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.05);
+      gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + 0.3);
+    } catch (e) {
+      console.log("Audio Context blocked by browser");
+    }
+  };
+
+  const addAlarm = (message, type = 'info') => {
+    const newAlarm = {
+      id: Date.now(),
+      message,
+      type,
+      date: new Date().toISOString(),
+      read: false
+    };
+    setAlarms(prev => [newAlarm, ...prev].slice(0, 20)); // Keep last 20
+    playAlarmSound();
+  };
+
+  useEffect(() => {
+    localStorage.setItem('alarms', JSON.stringify(alarms));
+  }, [alarms]);
 
   useEffect(() => {
     // Paint the walls with the user's favorite theme.
     // Darkness is my ally.
     document.body.className = settings.theme + '-theme';
+    document.documentElement.dir = settings.language === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.lang = settings.language;
+
     // Math for colors. Don't ask me how this works, I'm just a dev.
     // If it breaks, I'm becoming a gardener.
     const adjustColor = (hex, amount) => {
@@ -117,27 +168,41 @@ function App() {
       minStock: parseInt(product.minStock)
     };
     setProducts([...products, newProduct]);
+    addAlarm(`Product Added: ${newProduct.name}`, 'success');
   };
 
   const updateProduct = (updatedProduct) => {
     setProducts(products.map(p => p.id === updatedProduct.id ? updatedProduct : p));
+    addAlarm(`Product Updated: ${updatedProduct.name}`, 'info');
   };
 
   const deleteProduct = (id) => {
+    const product = products.find(p => p.id === id);
     setProducts(products.filter(p => p.id !== id));
+    if (product) addAlarm(`Product Deleted: ${product.name}`, 'warning');
   };
 
-  const recordSale = (productId, quantity, workerId) => {
+  const recordSale = (productId, quantity, workerId, discount = { value: 0, type: 'amount', total: 0 }) => {
     const product = products.find(p => p.id === productId);
     if (!product || product.quantity < quantity) return false;
 
     // Update product quantity
-    setProducts(products.map(p => 
-      p.id === productId ? { ...p, quantity: p.quantity - quantity } : p
-    ));
+    setProducts(products.map(p => {
+      if (p.id === productId) {
+        const newQty = p.quantity - quantity;
+        if (newQty <= p.minStock) {
+          addAlarm(`Low Stock: ${p.name} (${newQty} left)`, 'warning');
+        }
+        return { ...p, quantity: newQty };
+      }
+      return p;
+    }));
 
     // Update worker stats
-    const saleAmount = product.price * quantity;
+    const saleAmount = discount.total || (product.price * quantity);
+    const workerName = workers.find(w => w.id === workerId).name;
+    addAlarm(`New Sale: ${product.name} x${quantity} by ${workerName} (Total: $${saleAmount.toFixed(2)})`, 'success');
+
     setWorkers(workers.map(w => 
       w.id === workerId 
         ? { ...w, totalSales: w.totalSales + saleAmount, salesCount: w.salesCount + 1 }
@@ -152,8 +217,9 @@ function App() {
       quantity,
       price: product.price,
       total: saleAmount,
+      discount: discount.value > 0 ? { value: discount.value, type: discount.type } : null,
       workerId,
-      workerName: workers.find(w => w.id === workerId).name,
+      workerName,
       date: new Date().toISOString()
     };
     setSales([...sales, sale]);
@@ -169,6 +235,8 @@ function App() {
     setProducts(products.map(p => 
       p.id === productId ? { ...p, quantity: p.quantity + quantity } : p
     ));
+
+    addAlarm(`Stock Replenished: ${product.name} (+${quantity})`, 'info');
 
     // Record purchase
     const purchase = {
@@ -187,7 +255,7 @@ function App() {
 
   return (
     <div className="app">
-      <Navbar settings={settings} setSettings={setSettings} />
+      <Navbar settings={settings} setSettings={setSettings} alarms={alarms} setAlarms={setAlarms} />
       <Routes>
         <Route path="/" element={
           <Home 
@@ -198,6 +266,7 @@ function App() {
             recordSale={recordSale}
             recordPurchase={recordPurchase}
             workers={workers}
+            settings={settings}
           />
         } />
         <Route path="/dashboard" element={
@@ -207,6 +276,7 @@ function App() {
             sales={sales}
             purchases={purchases}
             settings={settings}
+            addAlarm={addAlarm}
           />
         } />
       </Routes>
